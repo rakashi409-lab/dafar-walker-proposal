@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="proposal-version" content="20260917-2">
   <meta name="theme-color" content="#f4f3ee">
   <meta name="description" content="大方设计 · 多功能老年人助行器设计提案。随行助行、休憩安坐、简约收纳，让日常出行更加从容。">
   <title>从容随行 · 多功能老年人助行器 | 大方设计</title>
   <link rel="icon" href="assets/favicon.png">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260917-2">
 </head>
 <body>
   <a class="skip-link" href="#concept">跳至方案内容</a>
@@ -89,12 +90,12 @@
   <button id="back-top" class="back-top" hidden aria-label="回到顶部">↑</button>
   <div id="brand-cursor" aria-hidden="true"><img src="assets/dafar-mark.png" alt=""><span class="cursor-label"></span></div>
   <dialog id="lightbox" aria-labelledby="lightbox-title" aria-describedby="lightbox-description">
-    <div class="lightbox-top"><span class="lightbox-brand">DAFAR <small>DESIGN VIEWER</small></span><span id="lightbox-index">01 / 14</span><div class="viewer-actions"><button id="lightbox-zoom" aria-label="放大图片" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg></button><a id="lightbox-open-original" href="assets/render-11.webp" target="_blank" rel="noopener" aria-label="在新页面打开原图">↗</a><button id="lightbox-close" aria-label="关闭图片查看器"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div></div>
-    <div id="lightbox-stage"><img id="lightbox-image" src="assets/render-11.webp" alt=""><p id="image-status" role="status" aria-live="polite"></p></div>
+    <div class="lightbox-top"><span class="lightbox-brand">DAFAR <small>DESIGN VIEWER</small></span><span id="lightbox-index">01 / 14</span><div class="viewer-actions"><button id="lightbox-zoom-out" aria-label="缩小图片" title="缩小图片"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><button id="lightbox-fit" aria-label="恢复完整居中显示" title="恢复完整居中显示">100%</button><button id="lightbox-zoom" aria-label="放大图片" title="放大图片"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5M7 10h6m-3-3v6"/></svg></button><a id="lightbox-open-original" href="assets/render-11.webp" target="_blank" rel="noopener" aria-label="在新页面打开原图">↗</a><button id="lightbox-close" aria-label="关闭图片查看器"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div></div>
+    <div id="lightbox-stage" role="region" aria-label="图片查看区域，双击放大，拖动查看细节，滚轮缩放" tabindex="0"><img id="lightbox-image" draggable="false" src="assets/render-11.webp" alt=""><p id="image-status" role="status" aria-live="polite"></p></div>
     <button id="lightbox-prev" class="viewer-prev" aria-label="上一张图片">←</button><button id="lightbox-next" class="viewer-next" aria-label="下一张图片">→</button>
-    <div class="lightbox-bottom"><div><h3 id="lightbox-title"></h3><p id="lightbox-description"></p></div><span>← → 切换图片 <i></i> ESC 关闭</span></div>
+    <div class="lightbox-bottom"><div><h3 id="lightbox-title"></h3><p id="lightbox-description"></p></div><span class="viewer-hint"><span class="viewer-hint-desktop">双击放大 · 拖动查看 · 滚轮缩放</span><span class="viewer-hint-touch">双指缩放 · 拖动查看</span></span></div>
   </dialog>
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="data.js?v=20260917-2"></script>
+  <script src="app.js?v=20260917-2"></script>
 </body>
 </html>

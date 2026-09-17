@@ -40,7 +40,11 @@
   let opener = null;
   let scrollStyles = null;
   let zoomed = false;
+  const view = { scale: 1, x: 0, y: 0, width: 0, height: 0, naturalWidth: 0, naturalHeight: 0, ready: false };
+  const pointers = new Map();
+  let gesture = null;
   let touchStart = null;
+  const MAX_ZOOM = 6;
   const originalUrls = new Map();
 
   function originalUrl(source) {
@@ -60,16 +64,58 @@
     originalUrls.clear();
   });
 
-  function setZoom(value, origin) {
-    zoomed = Boolean(value);
-    stage?.classList.toggle('is-zoomed', zoomed);
-    if (largeImage) largeImage.style.transformOrigin = origin || '50% 50%';
-    const button = $('#lightbox-zoom');
-    if (button) {
-      button.setAttribute('aria-pressed', String(zoomed));
-      button.setAttribute('aria-label', zoomed ? '缩小图片' : '放大图片');
-      button.setAttribute('title', zoomed ? '缩小图片' : '放大图片');
+  function renderView() {
+    if (!stage || !largeImage) return;
+    const limitX = Math.max(0, (view.width * view.scale - stage.clientWidth) / 2);
+    const limitY = Math.max(0, (view.height * view.scale - stage.clientHeight) / 2);
+    view.x = Math.max(-limitX, Math.min(limitX, view.x));
+    view.y = Math.max(-limitY, Math.min(limitY, view.y));
+    zoomed = view.scale > 1.001;
+    stage.classList.toggle('is-zoomed', zoomed);
+    largeImage.style.transform = `translate(-50%, -50%) translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})`;
+    const percent = Math.round(view.scale * 100);
+    setText('#lightbox-fit', `${percent}%`);
+    $('#lightbox-fit')?.setAttribute('aria-label', `当前缩放 ${percent}%，点击恢复完整居中显示`);
+    if ($('#lightbox-zoom')) $('#lightbox-zoom').disabled = !view.ready || view.scale >= MAX_ZOOM;
+    if ($('#lightbox-zoom-out')) $('#lightbox-zoom-out').disabled = !view.ready || !zoomed;
+  }
+
+  function fitImage(reset = false) {
+    if (!stage || !largeImage || !view.ready || !dialog?.open) return;
+    const padding = stage.clientWidth < 600 ? 14 : 26;
+    const fit = Math.min(
+      Math.max(1, stage.clientWidth - padding * 2) / view.naturalWidth,
+      Math.max(1, stage.clientHeight - padding * 2) / view.naturalHeight
+    );
+    view.width = view.naturalWidth * fit;
+    view.height = view.naturalHeight * fit;
+    largeImage.style.width = `${view.width}px`;
+    largeImage.style.height = `${view.height}px`;
+    if (reset) { view.scale = 1; view.x = 0; view.y = 0; }
+    renderView();
+  }
+
+  function setZoom(scale, clientX, clientY) {
+    if (!view.ready || !stage) return;
+    const next = Math.max(1, Math.min(MAX_ZOOM, scale));
+    const box = stage.getBoundingClientRect();
+    const focusX = clientX == null ? 0 : clientX - box.left - box.width / 2;
+    const focusY = clientY == null ? 0 : clientY - box.top - box.height / 2;
+    const ratio = next / view.scale;
+    view.x = focusX - (focusX - view.x) * ratio;
+    view.y = focusY - (focusY - view.y) * ratio;
+    view.scale = next;
+    renderView();
+  }
+
+  function clearGesture() {
+    for (const id of pointers.keys()) {
+      if (stage?.hasPointerCapture(id)) stage.releasePointerCapture(id);
     }
+    pointers.clear();
+    gesture = null;
+    touchStart = null;
+    stage?.classList.remove('is-dragging');
   }
 
   function showImage(index) {
@@ -77,7 +123,11 @@
     imageIndex = (index + gallery.length) % gallery.length;
     const item = gallery[imageIndex];
     const request = ++imageRequest;
-    setZoom(false);
+    clearGesture();
+    view.ready = false;
+    view.scale = 1;
+    view.x = view.y = 0;
+    renderView();
     setText('#lightbox-title', item.title);
     setText('#lightbox-description', item.description);
     setText('#lightbox-index', `${String(imageIndex + 1).padStart(2, '0')} / ${String(gallery.length).padStart(2, '0')}`);
@@ -94,10 +144,17 @@
       original.setAttribute('aria-label', `打开原图：${item.title || '设计方案图片'}`);
     }
     const preload = new Image();
-    let retried = false;
-    preload.onload = () => {
+    const sources = [...new Set([item.viewer, item.full, item.src].filter(Boolean))];
+    let sourceIndex = 0;
+    preload.onload = async () => {
       if (request !== imageRequest) return;
       largeImage.src = preload.src;
+      if (largeImage.decode) await largeImage.decode().catch(() => {});
+      if (request !== imageRequest || !dialog?.open) return;
+      view.naturalWidth = preload.naturalWidth;
+      view.naturalHeight = preload.naturalHeight;
+      view.ready = true;
+      fitImage(true);
       largeImage.style.opacity = '';
       stage?.classList.remove('is-loading');
       stage?.setAttribute('aria-busy', 'false');
@@ -105,16 +162,15 @@
     };
     preload.onerror = () => {
       if (request !== imageRequest) return;
-      if (!retried && item.src && item.full && item.src !== item.full) {
-        retried = true;
-        preload.src = item.src;
+      if (++sourceIndex < sources.length) {
+        preload.src = sources[sourceIndex];
         return;
       }
       stage?.classList.remove('is-loading');
       stage?.setAttribute('aria-busy', 'false');
       if (imageStatus) imageStatus.textContent = '图片暂时无法加载，请点击“原图”查看。';
     };
-    preload.src = item.full || item.src;
+    preload.src = sources[0];
   }
 
   function lockScroll() {
@@ -161,7 +217,11 @@
   function afterClose() {
     imageRequest += 1;
     unlockScroll();
-    setZoom(false);
+    clearGesture();
+    view.ready = false;
+    view.scale = 1;
+    view.x = view.y = 0;
+    renderView();
     document.documentElement.classList.remove('lightbox-open');
     if (opener?.isConnected) opener.focus({ preventScroll: true });
     opener = null;
@@ -176,7 +236,9 @@
   $('#lightbox-close')?.addEventListener('click', closeImage);
   $('#lightbox-prev')?.addEventListener('click', () => showImage(imageIndex - 1));
   $('#lightbox-next')?.addEventListener('click', () => showImage(imageIndex + 1));
-  $('#lightbox-zoom')?.addEventListener('click', () => setZoom(!zoomed));
+  $('#lightbox-zoom')?.addEventListener('click', () => setZoom(view.scale * 1.5));
+  $('#lightbox-zoom-out')?.addEventListener('click', () => setZoom(view.scale / 1.5));
+  $('#lightbox-fit')?.addEventListener('click', () => { clearGesture(); fitImage(true); });
   dialog?.addEventListener('close', afterClose);
   let backdropPointerDown = false;
   dialog?.addEventListener('pointerdown', (event) => {
@@ -187,7 +249,16 @@
     backdropPointerDown = false;
   });
   dialog?.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowLeft') {
+    if (event.key === '+' || event.key === '=') {
+      event.preventDefault();
+      setZoom(view.scale * 1.25);
+    } else if (event.key === '-') {
+      event.preventDefault();
+      setZoom(view.scale / 1.25);
+    } else if (event.key === '0') {
+      event.preventDefault();
+      fitImage(true);
+    } else if (event.key === 'ArrowLeft') {
       event.preventDefault();
       showImage(imageIndex - 1);
     } else if (event.key === 'ArrowRight') {
@@ -198,30 +269,83 @@
       closeImage();
     }
   });
-  stage?.addEventListener('pointermove', (event) => {
-    if (!zoomed || event.pointerType === 'touch' || !largeImage) return;
-    const box = stage.getBoundingClientRect();
-    const x = Math.min(100, Math.max(0, ((event.clientX - box.left) / box.width) * 100));
-    const y = Math.min(100, Math.max(0, ((event.clientY - box.top) / box.height) * 100));
-    largeImage.style.transformOrigin = `${x}% ${y}%`;
-  });
   stage?.addEventListener('dblclick', (event) => {
-    if (event.target !== largeImage) return;
-    const box = stage.getBoundingClientRect();
-    setZoom(!zoomed, `${((event.clientX - box.left) / box.width) * 100}% ${((event.clientY - box.top) / box.height) * 100}%`);
+    event.preventDefault();
+    setZoom(zoomed ? 1 : 2.5, event.clientX, event.clientY);
   });
-  stage?.addEventListener('touchstart', (event) => {
-    if (event.touches.length !== 1 || zoomed) { touchStart = null; return; }
-    touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
-  }, { passive: true });
-  stage?.addEventListener('touchend', (event) => {
-    if (!touchStart || zoomed || !event.changedTouches.length) return;
-    const dx = event.changedTouches[0].clientX - touchStart.x;
-    const dy = event.changedTouches[0].clientY - touchStart.y;
-    if (Math.abs(dx) > 64 && Math.abs(dx) > Math.abs(dy) * 1.5) showImage(imageIndex + (dx < 0 ? 1 : -1));
+  stage?.addEventListener('wheel', (event) => {
+    if (!view.ready) return;
+    event.preventDefault();
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1;
+    const delta = Math.max(-240, Math.min(240, event.deltaY * unit));
+    setZoom(view.scale * Math.exp(-delta * 0.002), event.clientX, event.clientY);
+  }, { passive: false });
+
+  function beginGesture() {
+    const points = [...pointers.values()];
+    if (points.length >= 2) {
+      const [a, b] = points;
+      gesture = { type: 'pinch', distance: Math.hypot(b.x - a.x, b.y - a.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      touchStart = null;
+    } else if (points.length === 1) {
+      gesture = { type: 'pan', x: points[0].x, y: points[0].y };
+    } else gesture = null;
+    stage?.classList.toggle('is-dragging', Boolean(gesture && zoomed));
+  }
+  stage?.addEventListener('pointerdown', (event) => {
+    if (!view.ready || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    if (event.pointerType === 'mouse' && !zoomed) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    stage.setPointerCapture(event.pointerId);
+    if (event.pointerType === 'touch' && !zoomed && pointers.size === 1) {
+      touchStart = { x: event.clientX, y: event.clientY };
+    }
+    beginGesture();
+  });
+  stage?.addEventListener('pointermove', (event) => {
+    if (!pointers.has(event.pointerId) || !gesture) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    const points = [...pointers.values()];
+    if (gesture.type === 'pinch' && points.length >= 2) {
+      const [a, b] = points;
+      const distance = Math.hypot(b.x - a.x, b.y - a.y);
+      const x = (a.x + b.x) / 2;
+      const y = (a.y + b.y) / 2;
+      setZoom(view.scale * distance / Math.max(1, gesture.distance), gesture.x, gesture.y);
+      view.x += x - gesture.x;
+      view.y += y - gesture.y;
+      gesture = { type: 'pinch', distance, x, y };
+      renderView();
+    } else if (gesture.type === 'pan') {
+      if (zoomed) {
+        view.x += event.clientX - gesture.x;
+        view.y += event.clientY - gesture.y;
+        renderView();
+      }
+      gesture.x = event.clientX;
+      gesture.y = event.clientY;
+    }
+  });
+  function endPointer(event) {
+    if (!pointers.has(event.pointerId)) return;
+    const swipe = event.type === 'pointerup' && pointers.size === 1 && touchStart && !zoomed ? touchStart : null;
+    pointers.delete(event.pointerId);
+    if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
     touchStart = null;
-  }, { passive: true });
-  stage?.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
+    beginGesture();
+    if (swipe) {
+      const dx = event.clientX - swipe.x;
+      const dy = event.clientY - swipe.y;
+      if (Math.abs(dx) > 64 && Math.abs(dx) > Math.abs(dy) * 1.5) showImage(imageIndex + (dx < 0 ? 1 : -1));
+    }
+  }
+  stage?.addEventListener('pointerup', endPointer);
+  stage?.addEventListener('pointercancel', endPointer);
+  stage?.addEventListener('lostpointercapture', endPointer);
+  largeImage?.addEventListener('dragstart', (event) => event.preventDefault());
+  window.addEventListener('blur', clearGesture);
+  if (stage && 'ResizeObserver' in window) new ResizeObserver(() => fitImage()).observe(stage);
+  else window.addEventListener('resize', () => fitImage());
 
   function setTabState(buttons, activeIndex) {
     buttons.forEach((button, index) => {
