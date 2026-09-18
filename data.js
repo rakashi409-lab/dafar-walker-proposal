@@ -21,20 +21,33 @@ window.PROPOSAL_DATA = {
     {title:'简约收纳',en:'FOLD',description:'将靠背、扶手与两侧管架依次收合，完成整体对叠。以更紧凑的形态，减少闲置时的空间占用。',detail:'整体对叠结构 / 紧凑收纳',assetId:'store-form'}
   ],
   transitions: [
-    {title:'随行助行 → 休憩安坐',steps:[
-      {title:'取袋，翻转座架',description:'取下布袋，将底座上方部件顺时针旋转至水平状态。',assetId:'frame-form'},
-      {title:'展开靠背与扶手',description:'靠背逆时针旋转至竖直状态，扶手向上抽出。',assetId:'sit-form'},
-      {title:'完成休憩形态',description:'坐垫、靠背与扶手形成休憩支撑，呈现安坐时的人机关系。',assetId:'sit-front'}
+    {title:'随行助行 → 休憩安坐',sourceSlide:5,states:[
+      {title:'随行助行',assetId:'walk-form',description:'布袋安装于助行结构上，保持日常出行形态。'},
+      {title:'座架放平',assetId:'frame-form',description:'取下布袋后，底座上方部件已旋转至水平状态。'},
+      {title:'休憩安坐',assetId:'sit-form',description:'靠背竖直展开，扶手向上抽出，完成休憩安坐形态。'}
+    ],steps:[
+      {title:'取袋，翻转座架',description:'取下布袋，将底座上方部件顺时针旋转至水平状态。',motion:'lower'},
+      {title:'展开靠背与扶手',description:'靠背逆时针旋转至竖直状态，扶手向上抽出。',motion:'raise'}
     ]},
-    {title:'休憩安坐 → 简约收纳',steps:[
-      {title:'放平靠背，收回扶手',description:'靠背顺时针旋转至水平状态，扶手向下收缩。',assetId:'frame-form'},
-      {title:'向外旋转扶手',description:'扶手向外旋转，直至与下方管架平行。',assetId:'fold-form'},
-      {title:'向内收合',description:'两侧向内挤压收缩，完成简约收纳形态。',assetId:'store-form'}
+    {title:'休憩安坐 → 简约收纳',sourceSlide:6,states:[
+      {title:'休憩安坐',assetId:'sit-form',description:'靠背与扶手处于展开状态，由安坐形态开始收纳。'},
+      {title:'靠背放平',assetId:'frame-form',description:'靠背已旋转至水平状态，扶手向下收缩。'},
+      {title:'扶手外旋',assetId:'fold-form',description:'扶手向外旋转至与下方管架平行，准备收合。'},
+      {title:'简约收纳',assetId:'store-form',description:'两侧向内挤压收缩，完成紧凑的收纳形态。'}
+    ],steps:[
+      {title:'放平靠背，收回扶手',description:'靠背顺时针旋转至水平状态，扶手向下收缩。',motion:'lower'},
+      {title:'向外旋转扶手',description:'扶手向外旋转，直至与下方管架平行。',motion:'rotate'},
+      {title:'向内收合',description:'两侧向内挤压收缩，完成简约收纳形态。',motion:'collapse'}
     ]},
-    {title:'随行助行 → 简约收纳',steps:[
-      {title:'取袋，翻转座架',description:'取下布袋，将底座上方部件顺时针旋转至水平状态。',assetId:'frame-form'},
-      {title:'向外旋转扶手',description:'扶手向外旋转，直至与下方管架平行。',assetId:'fold-form'},
-      {title:'向内收合',description:'两侧向内挤压收缩，完成整体折叠。',assetId:'store-form'}
+    {title:'随行助行 → 简约收纳',sourceSlide:7,states:[
+      {title:'随行助行',assetId:'walk-form',description:'布袋安装于助行结构上，由助行形态开始收纳。'},
+      {title:'座架放平',assetId:'frame-form',description:'取下布袋后，底座上方部件已旋转至水平状态。'},
+      {title:'扶手外旋',assetId:'fold-form',description:'扶手向外旋转至与下方管架平行，准备收合。'},
+      {title:'简约收纳',assetId:'store-form',description:'两侧向内挤压收缩，完成整体折叠。'}
+    ],steps:[
+      {title:'取袋，翻转座架',description:'取下布袋，将底座上方部件顺时针旋转至水平状态。',motion:'lower'},
+      {title:'向外旋转扶手',description:'扶手向外旋转，直至与下方管架平行。',motion:'rotate'},
+      {title:'向内收合',description:'两侧向内挤压收缩，完成整体折叠。',motion:'collapse'}
     ]}
   ]
 };

@@ -418,53 +418,6 @@
   installTabKeys(modeButtons, selectMode);
   if (modes.length) selectMode(0, false);
 
-  const routeButtons = $$('[data-route]');
-  const routeSteps = $('#route-steps');
-  let selectedRoute = -1;
-  function selectRoute(index) {
-    const route = routes[index];
-    if (!route || !routeSteps || selectedRoute === index) return;
-    selectedRoute = index;
-    setTabState(routeButtons, index);
-    setText('#route-title', route.title);
-    const fragment = document.createDocumentFragment();
-    (route.steps || []).forEach((step, stepIndex) => {
-      const asset = assets.get(String(step.assetId));
-      const article = document.createElement('article');
-      article.className = 'step';
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'step-image';
-      button.dataset.openImage = String(step.assetId);
-      button.setAttribute('aria-label', `查看步骤 ${stepIndex + 1}：${step.title}`);
-      if (asset) {
-        const image = document.createElement('img');
-        image.src = asset.src || asset.full;
-        image.alt = asset.title || step.title || '';
-        image.loading = 'lazy';
-        image.decoding = 'async';
-        button.append(image);
-      }
-      const number = document.createElement('span');
-      number.className = 'step-count';
-      number.textContent = String(stepIndex + 1).padStart(2, '0');
-      const title = document.createElement('h4');
-      title.textContent = step.title || '';
-      const description = document.createElement('p');
-      description.textContent = step.description || '';
-      article.append(button, number, title, description);
-      fragment.append(article);
-    });
-    routeSteps.replaceChildren(fragment);
-    if (routeButtons[index]?.id) $('#route-panel')?.setAttribute('aria-labelledby', routeButtons[index].id);
-    if (!reducedMotion() && typeof routeSteps.animate === 'function') {
-      routeSteps.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 360, easing: 'cubic-bezier(.22,1,.36,1)' });
-    }
-  }
-  routeButtons.forEach((button, index) => button.addEventListener('click', () => selectRoute(index)));
-  installTabKeys(routeButtons, selectRoute);
-  if (routes.length) selectRoute(0);
-
   const galleryFilters = $$('[data-gallery-filter]');
   const galleryItems = $$('.gallery-item[data-category]');
   galleryFilters.forEach((button) => {
@@ -553,11 +506,9 @@
   function drawCursor() {
     cursorFrame = 0;
     if (!cursor || !cursorVisible || !finePointer.matches) return;
-    const follow = reducedMotion() ? 1 : 0.38;
-    cursorX += (targetX - cursorX) * follow;
-    cursorY += (targetY - cursorY) * follow;
-    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
-    if (Math.abs(targetX - cursorX) > 0.1 || Math.abs(targetY - cursorY) > 0.1) cursorFrame = requestAnimationFrame(drawCursor);
+    cursorX = targetX;
+    cursorY = targetY;
+    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
   }
 
   function hideCursor() {
@@ -585,7 +536,7 @@
       cursor.classList.toggle('is-active', Boolean(target));
       cursor.classList.toggle('is-image', Boolean(imageTarget));
       if (cursorLabel) cursorLabel.textContent = imageTarget ? '查看' : '';
-      if (!cursorFrame) cursorFrame = requestAnimationFrame(drawCursor);
+      drawCursor();
     }, { passive: true });
     document.addEventListener('pointerdown', () => cursor.classList.add('is-down'), { passive: true });
     document.addEventListener('pointerup', () => cursor.classList.remove('is-down'), { passive: true });

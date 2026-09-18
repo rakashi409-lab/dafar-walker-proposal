@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="proposal-version" content="20260917-2">
+  <meta name="proposal-version" content="20260918-1">
   <meta name="theme-color" content="#f4f3ee">
   <meta name="description" content="大方设计 · 多功能老年人助行器设计提案。随行助行、休憩安坐、简约收纳，让日常出行更加从容。">
   <title>从容随行 · 多功能老年人助行器 | 大方设计</title>
   <link rel="icon" href="assets/favicon.png">
-  <link rel="stylesheet" href="style.css?v=20260917-2">
+  <link rel="stylesheet" href="style.css?v=20260918-1">
 </head>
 <body>
   <a class="skip-link" href="#concept">跳至方案内容</a>
@@ -59,8 +59,27 @@
       <div class="section-eyebrow reveal"><span>03 / 形态转换</span><span>A SIMPLE SHIFT</span></div>
       <div class="section-heading reveal"><h2 id="transformation-heading">一套结构，<br>转换自如。</h2><p>旋转、伸缩与折叠。<br>让不同功能在同一结构中衔接。</p></div>
       <div class="route-tabs reveal" role="tablist" aria-label="选择形态转换路径"><button id="route-tab-0" data-route="0" role="tab" aria-selected="true" aria-controls="route-panel">助行 <span>↗</span> 安坐</button><button id="route-tab-1" data-route="1" role="tab" aria-selected="false" aria-controls="route-panel" tabindex="-1">安坐 <span>↗</span> 收纳</button><button id="route-tab-2" data-route="2" role="tab" aria-selected="false" aria-controls="route-panel" tabindex="-1">助行 <span>↗</span> 收纳</button></div>
-      <div id="route-panel" role="tabpanel" aria-labelledby="route-tab-0"><h3 id="route-title" class="sr-only">随行助行 → 休憩安坐</h3><div id="route-steps" class="route-steps reveal"></div></div>
-      <div class="process-note reveal"><span class="tiny-cross">+</span><p>通过部件旋转、靠背展开与扶手调节，完成使用形态的转换。</p><span>FORM FOLLOWS DAILY LIFE</span></div>
+      <div id="route-panel" class="flow-panel" role="tabpanel" aria-labelledby="route-tab-0">
+        <div class="flow-heading"><h3 id="route-title">随行助行 → 休憩安坐</h3><span id="flow-route-count">3 个形态 / 2 次转换</span></div>
+        <div class="flow-player">
+          <div id="flow-stage" class="flow-stage">
+            <span class="flow-stage-grid" aria-hidden="true"></span><span class="flow-stage-word" aria-hidden="true">TRANSFORM</span>
+            <button id="flow-image-button" class="flow-image-button" data-open-image="walk-form" aria-label="放大查看当前流程形态"><img id="flow-outgoing" src="assets/form-04.webp" alt="" aria-hidden="true"><img id="flow-image" src="assets/form-04.webp" alt="随行助行起始形态"><span class="flow-zoom-hint">查看当前形态 ↗</span></button>
+            <div id="flow-motion" class="flow-motion" aria-hidden="true"><svg class="motion-arc" viewBox="0 0 120 120"><path class="motion-path" d="M28 88 A44 44 0 1 1 95 83"/><path d="m79 80 16 4 4-16"/></svg><svg class="motion-lift" viewBox="0 0 160 120"><path d="M35 95V25m-10 12 10-12 10 12M125 95V25m-10 12 10-12 10 12"/></svg><svg class="motion-collapse" viewBox="0 0 200 80"><path d="M8 40h60m-14-12 14 12-14 12m138-12h-60m14-12-14 12 14 12"/></svg></div>
+            <div class="flow-stage-caption"><span id="flow-state-caption">起始形态 · 随行助行</span><span id="flow-state-index">01 / 03</span></div>
+          </div>
+          <div class="flow-narrative">
+            <p id="flow-operation-kicker" class="flow-kicker">START / 起始形态</p><h4 id="flow-operation-title">随行助行</h4><p id="flow-operation-text">搭配储物布袋的随行助行状态。</p>
+            <div class="flow-operation-progress" aria-hidden="true"><span id="flow-progress"></span></div>
+            <div class="flow-controls"><button id="flow-prev" class="flow-control-arrow" aria-label="上一个形态">←</button><button id="flow-play" class="flow-play" aria-label="播放转换过程"><span id="flow-play-icon" aria-hidden="true">▶</span><span id="flow-play-label">播放转换过程</span></button><button id="flow-next" class="flow-control-arrow" aria-label="下一个形态">→</button></div>
+            <p class="flow-control-note">顺序演示每一步，也可点击下方形态逐步查看。</p>
+            <p id="flow-announcement" class="sr-only" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+        <div class="flow-overview-heading"><span>完整转换路径</span><span>点击形态定位 · 点击箭头演示</span></div>
+        <div id="route-steps" class="flow-storyboard" aria-label="完整转换路径"></div>
+      </div>
+      <div class="process-note reveal"><span class="tiny-cross">+</span><p>按顺序展示起始形态、中间状态与最终形态，箭头说明每一步的转换动作。</p><span>FORM FOLLOWS DAILY LIFE</span></div>
     </section>
 
     <section class="feature-spread" aria-label="三种形态综合效果">
@@ -71,7 +90,7 @@
     <section class="gallery section-pad" id="gallery" aria-labelledby="gallery-heading">
       <div class="section-eyebrow reveal"><span>04 / 多角度效果图</span><span>A CLOSER LOOK</span></div>
       <div class="section-heading reveal"><h2 id="gallery-heading">换个角度，<br>看见设计。</h2><p>结构、姿态与使用关系。<br>点击图片，查看完整效果。</p></div>
-      <div class="gallery-filters reveal" role="group" aria-label="筛选效果图"><button data-gallery-filter="all" aria-pressed="true">全部 <sup>08</sup></button><button data-gallery-filter="walk" aria-pressed="false">随行</button><button data-gallery-filter="sit" aria-pressed="false">安坐</button><button data-gallery-filter="store" aria-pressed="false">收纳</button><button data-gallery-filter="overview" aria-pressed="false">总览</button></div>
+      <div class="gallery-filters" role="group" aria-label="筛选效果图"><button data-gallery-filter="all" aria-pressed="true">全部 <sup>08</sup></button><button data-gallery-filter="walk" aria-pressed="false">随行</button><button data-gallery-filter="sit" aria-pressed="false">安坐</button><button data-gallery-filter="store" aria-pressed="false">收纳</button><button data-gallery-filter="overview" aria-pressed="false">总览</button></div>
       <div class="gallery-grid">
         <figure class="gallery-item reveal" data-category="walk"><button data-open-image="walk-front" aria-label="放大：随行助行，正面视角"><img src="assets/render-11.webp" width="3000" height="1941" loading="lazy" alt="随行助行正面效果，展示储物布袋与手握位置"><span class="image-expand">↗</span></button><figcaption><div><span class="small-label">01 / WALK</span><h3>随行助行 · 正面视角</h3><p>储物布袋与助行结构相结合，满足出行时的置物需求。</p></div><span>↗</span></figcaption></figure>
         <figure class="gallery-item reveal" data-category="walk"><button data-open-image="walk-rear" aria-label="放大：随行助行，背侧视角"><img src="assets/render-10.webp" width="3000" height="1941" loading="lazy" alt="随行助行背侧效果，展示人体与助行器的位置关系"><span class="image-expand">↗</span></button><figcaption><div><span class="small-label">02 / WALK</span><h3>随行助行 · 背侧视角</h3><p>从背侧观察扶持姿态，以及人体与管架的相对关系。</p></div><span>↗</span></figcaption></figure>
@@ -95,7 +114,8 @@
     <button id="lightbox-prev" class="viewer-prev" aria-label="上一张图片">←</button><button id="lightbox-next" class="viewer-next" aria-label="下一张图片">→</button>
     <div class="lightbox-bottom"><div><h3 id="lightbox-title"></h3><p id="lightbox-description"></p></div><span class="viewer-hint"><span class="viewer-hint-desktop">双击放大 · 拖动查看 · 滚轮缩放</span><span class="viewer-hint-touch">双指缩放 · 拖动查看</span></span></div>
   </dialog>
-  <script src="data.js?v=20260917-2"></script>
-  <script src="app.js?v=20260917-2"></script>
+  <script src="data.js?v=20260918-1"></script>
+  <script src="app.js?v=20260918-1"></script>
+  <script src="flow.js?v=20260918-1"></script>
 </body>
 </html>
